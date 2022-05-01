@@ -131,14 +131,14 @@ class Tubo(object):
         parTubos.childs = [tubo_ar, tubo_ab]
 
         self.model = parTubos
-        self.pos_x = 1.3
+        self.pos_x = 1.5
         self.pos_y = 1
         self.borde_arriba = self.pos_y - a/200
         self.borde_abajo = self.pos_y - h + 10*a/200
         
 
     def drawn(self, pipeline, dx):
-        self.pos_x += dx
+        #self.pos_x += dx
         self.model.transform = tr.translate(self.pos_x, self.pos_y, 0)
         sg.drawSceneGraphNode(self.model, pipeline, "transform")
 
@@ -156,15 +156,17 @@ class TuberiasCreator(object):
     def die(self):
         self.on = False
 
-    def create_tuberia(self, pipeline, ti):
-        tacumulado = 0
+    def create_tuberia(self, pipeline):
+        self.tuberias.append(Tubo(pipeline))
+
+        """tacumulado = 0
         tacumulado += ti
-        if len(self.tuberias) >= 20 or not self.on: #no puede existir más de 1 tuberia en pantalla
+        if len(self.tuberias) >= 5 or not self.on: #no puede existir más de 5 tuberias en pantalla
             return
         if tacumulado > 2.5:
-            self.tuberias.append(Tubo(pipeline))
             tacumulado = 0
-            return
+            self.tuberias.append(Tubo(pipeline))
+            return"""
 
     def draw(self, pipeline, dx):
         for k in self.tuberias:
@@ -183,6 +185,7 @@ class TuberiasCreator(object):
             if k not in d:
                 remain_tuberias.append(k)
         self.tuberias = remain_tuberias
+        print(self.tuberias)
 
 
 #lugar de la imagen

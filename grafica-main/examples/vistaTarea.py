@@ -82,6 +82,8 @@ if __name__ == "__main__":
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
     t0 = 0
+    for i in range(0,10):
+        tubos.create_tuberia(pipeline)
 
     while not glfw.window_should_close(window):
 
@@ -104,17 +106,26 @@ if __name__ == "__main__":
         glUniformMatrix4fv(glGetUniformLocation(textpipeline.shaderProgram, "transform"), 1, GL_TRUE, headerTransform)
         textpipeline.drawCall(gpuHeader)"""
 
-        tubos.create_tuberia(pipeline, ti)
-        tubos.update(0.5*dt)
-        
+        for i in range(0,len(tubos.tuberias)):
+            if i == 0:
+                tubos.tuberias[i].update(0.5*dt)
+
+            else:
+                if tubos.tuberias[i-1].pos_x < 0:
+                    tubos.tuberias[i].update(0.5*dt)
+                       
+           
         pajaro.update(0.75*dt)
         pajaro.collide(tubos)
 
         pajaro.draw(pipeline)
 
         tubos.draw(pipeline, 1)
+
         
         #Suelo.draw(pipeline)
+
+
 
         for i in tubos.tuberias:
             if abs(pajaro.pos - i.pos_x) <0.025:
