@@ -16,6 +16,8 @@ from typing import List
 
 
 array = sys.argv
+#Nmax = array[1]
+Nmax = 10 
 N = 0
 
 #ubicacion de las texturas
@@ -35,6 +37,14 @@ def create_gpu(shape, pipeline):
     pipeline.setupVAO(gpu)
     gpu.fillBuffers(shape.vertices, shape.indices, GL_STATIC_DRAW)
     return gpu
+
+def create_gpu2(shape,pipeline):
+    bs.scaleVertices(shape,5,[2,2,1])
+    gpu = es.GPUShape().initBuffers()
+    pipeline.setupVAO(gpu)
+    gpu.fillBuffers(shape.vertices, shape.indices, GL_STATIC_DRAW)
+    return gpu
+
 
 class bird(object):
 
@@ -59,10 +69,11 @@ class bird(object):
         transform_personaje.childs += [personaje]
 
         self.model = transform_personaje
-        self.pos = 0
+        self.pos = -0.25
         self.y = 0.75
         self.alive = True
         self.victoria = False
+        self.pasoTuberia = False
     
     def draw(self, pipeline):
         sg.drawSceneGraphNode(self.model, pipeline, "transform")
@@ -85,15 +96,16 @@ class bird(object):
         deleted_tubos = []
 
         for t in tuberias.tuberias:
+            self.pasoTuberia = False
             #Elimina tuberias despues de pasar cierta posicion y añade un 1 al contador
             if t.pos_x < -1.3:
                 deleted_tubos.append(t)
+  
+            elif -0.301 < t.pos_x < -0.3:
                 global N
                 N += 1
-                print(N)
-                if N == 4: #array[1]:
+                if N == Nmax:
                     self.victoria = True
-                    print("Ganaste")
 
             #Detecta las colicions con el "techo" y en el "suelo"
             elif self.y > 1.3 or self.y < -1.3:
@@ -115,7 +127,7 @@ class Tubo(object):
 
 
         tubo = sg.SceneGraphNode("tubo")
-        a = random.randint(20,300)
+        a = random.randint(20,250)
         tubo.transform = tr.scale(0.25,a/100,1)
         tubo.childs += [gpu_tubo]
 
@@ -159,15 +171,6 @@ class TuberiasCreator(object):
     def create_tuberia(self, pipeline):
         self.tuberias.append(Tubo(pipeline))
 
-        """tacumulado = 0
-        tacumulado += ti
-        if len(self.tuberias) >= 5 or not self.on: #no puede existir más de 5 tuberias en pantalla
-            return
-        if tacumulado > 2.5:
-            tacumulado = 0
-            self.tuberias.append(Tubo(pipeline))
-            return"""
-
     def draw(self, pipeline, dx):
         for k in self.tuberias:
             k.drawn(pipeline, dx*self.tuberias.index(k))
@@ -185,17 +188,16 @@ class TuberiasCreator(object):
             if k not in d:
                 remain_tuberias.append(k)
         self.tuberias = remain_tuberias
-        print(self.tuberias)
 
 
 #lugar de la imagen
 thisFilePath = os.path.abspath(__file__)
 thisFolderPath = os.path.dirname(thisFilePath)
 spritesDirectory = os.path.join(thisFolderPath, "texturas")
-spritePathGameOver = os.path.join(spritesDirectory, "gameover.png")
+spritePathGameOver = os.path.join(spritesDirectory, "gameover.jpg")
 
 #pantalla que aparece cuando pierdes
-"""class GameOver(object):
+class GameOver(object):
 
     def __init__(self, pipeline):
         gpu_GameO = create_gpu(bs.createTextureQuad(1,1), pipeline)
@@ -203,13 +205,13 @@ spritePathGameOver = os.path.join(spritesDirectory, "gameover.png")
             spritePathGameOver, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST)
 
         GameO = sg.SceneGraphNode("GameOver")
-        GameO.transform = tr.uniformScale(1)
+        GameO.transform = tr.uniformScale(2.5)
         GameO.childs += [gpu_GameO]
 
         self.model = GameO
 
     def draw(self, pipeline):
-        sg.drawSceneGraphNode(self.model, pipeline, "transform")"""
+        sg.drawSceneGraphNode(self.model, pipeline, "transform")
 
 
 
@@ -233,6 +235,58 @@ class PantallaGanar(object):
 
     def drawn(self, pipeline):
         sg.drawSceneGraphNode(self.model, pipeline, "transform")
+
+
+# fondo del juego
+thisFilePath = os.path.abspath(__file__)
+thisFolderPath = os.path.dirname(thisFilePath)
+spritesDirectory = os.path.join(thisFolderPath, "texturas")
+spritePathFondo = os.path.join(spritesDirectory, "fondo4.jpg")
+
+class Fondo1(object):
+    def __init__(self, pipeline):
+        shapefondo1 = bs.createTextureQuad(1,1)
+        gpu_fondo1 = create_gpu2(shapefondo1, pipeline)
+        gpu_fondo1.texture = es.textureSimpleSetup(
+           spritePathFondo, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST 
+        )
+        fondo1 = sg.SceneGraphNode("Fondo1")
+        fondo1.transform = tr.uniformScale(2.5)
+        fondo1.childs += [gpu_fondo1]
+
+        self.model = fondo1
+        self.pos_x = 0
+
+    
+    def drawn(self, pipeline):
+        self.model.transform = tr.translate(self.pos_x,0,0)
+        sg.drawSceneGraphNode(self.model, pipeline, "transform")
+    
+    def update(self, dt):
+        self.pos_x -= dt
+
+class Fondo2(object):
+    def __init__(self, pipeline):
+        shapefondo2 = bs.createTextureQuad(1,1)
+        gpu_fondo2 = create_gpu2(shapefondo2, pipeline)
+        gpu_fondo2.texture = es.textureSimpleSetup(
+           spritePathFondo, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST 
+        )
+        fondo2 = sg.SceneGraphNode("Fondo1")
+        fondo2.transform = tr.scale(2,2,2)
+        
+        fondo2.childs += [gpu_fondo2]
+
+        self.model = fondo2
+        self.pos_x = 2
+
+    
+    def drawn(self, pipeline):
+        self.model.transform = tr.translate(self.pos_x,0,0)
+        sg.drawSceneGraphNode(self.model, pipeline, "transform")
+    
+    def update(self, dt):
+        self.pos_x -= dt
 
 
 
