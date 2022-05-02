@@ -104,6 +104,7 @@ class bird(object):
             elif -0.301 < t.pos_x < -0.3:
                 global N
                 N += 1
+                print(N)
                 if N == Nmax:
                     self.victoria = True
 
