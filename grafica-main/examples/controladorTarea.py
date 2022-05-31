@@ -1,7 +1,7 @@
 
 #contorlador
 
-from modeloTrarea import *
+from modeloTarea import *
 import glfw
 import sys
 from typing import Union

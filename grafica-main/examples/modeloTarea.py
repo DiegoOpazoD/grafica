@@ -15,10 +15,7 @@ import random
 from typing import List
 
 
-array = sys.argv
-#Nmax = array[1]
-Nmax = 10 
-N = 0
+
 
 #ubicacion de las texturas
 thisFilePath = os.path.abspath(__file__)
@@ -74,6 +71,7 @@ class bird(object):
         self.alive = True
         self.victoria = False
         self.pasoTuberia = False
+        self.N = 0
     
     def draw(self, pipeline):
         sg.drawSceneGraphNode(self.model, pipeline, "transform")
@@ -92,21 +90,22 @@ class bird(object):
             return
         self.y += 0.15
     
-    def collide(self, tuberias: "TuberiasCreator"):
+    def collide(self, tuberias: "TuberiasCreator", Nmax):
         deleted_tubos = []
 
         for t in tuberias.tuberias:
-            self.pasoTuberia = False
-            #Elimina tuberias despues de pasar cierta posicion y añade un 1 al contador
-            if t.pos_x < -1.3:
-                deleted_tubos.append(t)
-  
-            elif -0.301 < t.pos_x < -0.3:
-                global N
-                N += 1
-                print(N)
-                if N == Nmax:
+            #print(t.pos_x)
+            #Elimina tuberias despues de pasar cierta posicion y aÃ±ade un 1 al contador
+            
+            if t.pos_x <= -0.7 and not t.pasoTuberia and self.alive and not self.victoria:
+                t.pasoTuberia = True
+                self.N += 1
+                print("El n",self.N)
+                if self.N == Nmax:
                     self.victoria = True
+            
+            elif t.pos_x < -1.3:
+                deleted_tubos.append(t)
 
             #Detecta las colicions con el "techo" y en el "suelo"
             elif self.y > 1.3 or self.y < -1.3:
@@ -148,10 +147,11 @@ class Tubo(object):
         self.pos_y = 1
         self.borde_arriba = self.pos_y - a/200
         self.borde_abajo = self.pos_y - h + 10*a/200
+        self.pasoTuberia = False
         
 
     def drawn(self, pipeline, dx):
-        #self.pos_x += dx
+
         self.model.transform = tr.translate(self.pos_x, self.pos_y, 0)
         sg.drawSceneGraphNode(self.model, pipeline, "transform")
 
@@ -288,6 +288,7 @@ class Fondo2(object):
     
     def update(self, dt):
         self.pos_x -= dt
+
 
 
 

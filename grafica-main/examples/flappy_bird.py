@@ -1,13 +1,15 @@
-
 #vistaTarea
 
 import glfw
 import sys
 from OpenGL.GL import *
 import OpenGL.GL.shaders
-from modeloTrarea import *
-from controladorTrarea import Controller
+from modeloTarea import *
+from controladorTarea import Controller
 import grafica.text_renderer as tx
+
+Nmax = 10
+
 
 
 if __name__ == "__main__":
@@ -58,11 +60,13 @@ if __name__ == "__main__":
     controlador.set_GameO(GameO)
 
 
+
     #crea las tuberias
-    for i in range(0,Nmax+2):
+    for i in range(0,int(Nmax)+2):
         tubos.create_tuberia(pipeline)
 
     t0 = 0
+
     while not glfw.window_should_close(window):
 
         glUseProgram(pipeline.shaderProgram)
@@ -100,7 +104,7 @@ if __name__ == "__main__":
 
         pajaro.draw(pipeline)
         pajaro.update(0.75*dt)
-        pajaro.collide(tubos)
+        pajaro.collide(tubos, int(Nmax))
 
         tubos.draw(pipeline, 1)
 
@@ -115,7 +119,7 @@ if __name__ == "__main__":
         if pajaro.victoria == True:
             win.drawn(pipeline)
         
-        """textPipeline = tx.TextureTextRendererShaderProgram()
+        textPipeline = tx.TextureTextRendererShaderProgram()
 
         # contador en pantalla
         #crear texturas con los caracteres
@@ -123,7 +127,7 @@ if __name__ == "__main__":
         #mover las texturas a la gpu
         gpuText3DTexture = tx.toOpenGLTexture(textBitsTexture)
 
-        headerText = str(N)
+        headerText = str(pajaro.N)
         headerCharSize = 0.1
         headerCenterX = headerCharSize * len(headerText) / 2
         headerShape = tx.textToShape(headerText, headerCharSize, headerCharSize)
@@ -141,7 +145,7 @@ if __name__ == "__main__":
         glUniform4f(glGetUniformLocation(textPipeline.shaderProgram, "fontColor"), 1,1,1,0)
         glUniform4f(glGetUniformLocation(textPipeline.shaderProgram, "backColor"), 0,0,0,1)
         glUniformMatrix4fv(glGetUniformLocation(textPipeline.shaderProgram, "transform"), 1, GL_TRUE, headerTransform)
-        textPipeline.drawCall(gpuHeader)"""
+        textPipeline.drawCall(gpuHeader)
         
 
         glfw.swap_buffers(window)
