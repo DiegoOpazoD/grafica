@@ -8,7 +8,7 @@ from typing import Union
 LIGHT_FLAT = 0
 
 class Controller(object):
-    tuberias: Union["tuberia", None]
+    tuberias: Union["tuberiasCreator", None]
 
 
     def __init__(self):

@@ -27,12 +27,16 @@ if __name__ == "__main__":
 
     glfw.set_key_callback(window, Controller.on_key)
 
+
     #diferentes shader programs para diferentes iluminaciones, despues elije una
     #flatpipeline = ls.SimpleFlatShaderProgram()
     #gourdaudipeline = ls.SimpleGouraudShaderProgram()
     pipeline = ls.SimplePhongShaderProgram()
     #este shader no considera iluminacion
     mvpPipeline = es.SimpleModelViewProjectionShaderProgram()
+
+    #Le decimos a OpenGL que usaremos este ShaderProgram
+    glUseProgram(pipeline.shaderProgram)
 
     #color de la pantalla
     glClearColor(0.15,0.15,0.15,1.0)
@@ -48,9 +52,15 @@ if __name__ == "__main__":
     #axis
     gpuAxis = createGPUShape(bs.createAxis(4), mvpPipeline)
 
-    tubos = tuberia(pipeline)
+    tubos = tuberiasCreator()
 
     controlador.set_tuberias(tubos)
+
+    #crea las tuberias
+    for i in range(0,int(10)+2):
+        tubos.create_tuberias(pipeline)
+
+    t0 = 0
 
     while not glfw.window_should_close(window):
 
@@ -66,6 +76,14 @@ if __name__ == "__main__":
         t1 = glfw.get_time()
         dt = t1 - t0
         t0 = t1
+
+        for i in range(0,len(tubos.tuberiasList)):
+            if i == 0:
+                tubos.tuberiasList[i].update(0.5*dt)
+
+            else:
+                if tubos.tuberiasList[i-1].pos_x < 0:
+                    tubos.tuberiasList[i].update(0.5*dt)
 
         #despejando la escena tanto de color y profundidad
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -148,7 +166,8 @@ if __name__ == "__main__":
 
 
         #se dibujan las figuras
-        tubos.drawn(pipeline)
+        tubos.draw(pipeline, 1)
+        #print(tubos.pos_x)
 
 
 
